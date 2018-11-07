@@ -89,6 +89,7 @@ module MailCatcher extend self
     :verbose => false,
     :daemon => !windows?,
     :browse => false,
+		:db_path => ":memory:",
     :quit => true,
   }
 
@@ -124,6 +125,11 @@ module MailCatcher extend self
 
         parser.on("--http-port PORT", Integer, "Set the port address of the http server") do |port|
           options[:http_port] = port
+        end
+
+        parser.on("--db-path PATH", String, "Set path to database") do |path|
+					puts path
+          options[:db_path] = path
         end
 
         parser.on("--http-path PATH", String, "Add a prefix to all HTTP paths") do |path|
@@ -181,7 +187,9 @@ module MailCatcher extend self
       $stdout.sync = $stderr.sync = true
     end
 
-    puts "Starting MailCatcher"
+    puts "Starting MailCatcher with Patch"
+
+		Mail.db(options[:db_path])
 
     Thin::Logging.debug = development?
     Thin::Logging.silent = !development?
